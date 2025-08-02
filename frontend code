@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Diet Platform</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Carbon Diet Community Challenge</h1>
+
+        <div id="log-action-section">
+            <h2>Log Your Green Action</h2>
+            <form id="log-form">
+                <input type="text" id="username" placeholder="Your Username" required>
+                <input type="text" id="action" placeholder="e.g., Used Reusable Bag" required>
+                <input type="number" id="points" placeholder="Points (e.g., 5)" required>
+                <button type="submit">Log Action</button>
+            </form>
+            <p id="message"></p>
+        </div>
+
+        <hr>
+
+        <div id="leaderboard-section">
+            <h2>Community Leaderboard</h2>
+            <ul id="leaderboard-list">
+                </ul>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
