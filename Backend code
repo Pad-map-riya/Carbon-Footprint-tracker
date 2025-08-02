@@ -1,0 +1,95 @@
+from flask import Flask, request, jsonify
+import json
+import os
+
+app = Flask(_name_)
+
+# A simple in-memory data store for the hackathon. 
+# In a real application, you'd use a database like PostgreSQL or MongoDB.
+DATA_FILE = 'carbon_data.json'
+
+def load_data():
+    """Load data from a JSON file."""
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, 'r') as f:
+            return json.load(f)
+    return {'users': {}, 'leaderboard': []}
+
+def save_data(data):
+    """Save data to a JSON file."""
+    with open(DATA_FILE, 'w') as f:
+        json.dump(data, f, indent=4)
+
+def update_leaderboard(data):
+    """Sort users by points to create the leaderboard."""
+    data['leaderboard'] = sorted(
+        data['users'].values(),
+        key=lambda x: x['points'],
+        reverse=True
+    )
+    return data
+
+@app.route('/')
+def home():
+    """Simple homepage for the API."""
+    return "Welcome to the Carbon Diet API!"
+
+@app.route('/register', methods=['POST'])
+def register_user():
+    """Endpoint to register a new user."""
+    data = load_data()
+    username = request.json.get('username')
+    
+    if not username:
+        return jsonify({'error': 'Username is required'}), 400
+
+    if username in data['users']:
+        return jsonify({'error': 'Username already exists'}), 409
+
+    data['users'][username] = {
+        'username': username,
+        'points': 0,
+        'actions': []
+    }
+    save_data(data)
+    return jsonify({'message': f'User {username} registered successfully!'}), 201
+
+@app.route('/log_action', methods=['POST'])
+def log_action():
+    """Endpoint for a user to log a sustainable action and earn points."""
+    data = load_data()
+    username = request.json.get('username')
+    action = request.json.get('action')
+    points = request.json.get('points')
+    
+    if not all([username, action, points]):
+        return jsonify({'error': 'Username, action, and points are required'}), 400
+
+    if username not in data['users']:
+        return jsonify({'error': 'User not found'}), 404
+
+    try:
+        points = int(points)
+    except ValueError:
+        return jsonify({'error': 'Points must be an integer'}), 400
+
+    data['users'][username]['points'] += points
+    data['users'][username]['actions'].append({
+        'action': action,
+        'points': points,
+        'timestamp': request.json.get('timestamp') or 'N/A'
+    })
+    
+    data = update_leaderboard(data)
+    save_data(data)
+    
+    return jsonify({
+        'message': f'Action logged for {username}. New points: {data["users"][username]["points"]}'
+    })
+
+@app.route('/leaderboard', methods=['GET'])
+def get_leaderboard():
+    """Endpoint to get the current leaderboard."""
+    data = load_data()
+    return jsonify(data['leaderboard'])
+
