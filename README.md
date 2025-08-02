@@ -32,7 +32,7 @@ Rewards System: Redeem points for local discounts via QR code.
 Impact Tracker: Visualize carbon and water savings.
 
 ## GitHub Repository Link
-
+https://github.com/Pad-map-riya/Carbon-Footprint-tracker.git
 
 ## Team Members & Roles
 - Padma priya S S - Team Lead and frontend developer
